@@ -64,3 +64,14 @@ class CAState {
 class GJPointDouble {
 
 }
+
+class CCFontSprite : cocos2d::CCSprite {
+	PAD = win 0x8;
+	bool m_isInstant;
+	float m_instantValue;
+	float m_delayTime;
+	float m_shakeVal2;
+	float m_shakeVal1;
+    PAD = win 0x4;
+    int m_thisTagNumber;
+}

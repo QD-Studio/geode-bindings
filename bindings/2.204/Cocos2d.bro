@@ -1295,3 +1295,34 @@ class cocos2d::CCDelayTime {
 	virtual void update(float);
 	virtual cocos2d::CCActionInterval* reverse();
 }
+
+[[link(win, android)]]
+class cocos2d::CCTextureCache {
+	static void purgeSharedTextureCache();
+	static void reloadAllTextures();
+	static cocos2d::CCTextureCache* sharedTextureCache();
+
+	// CCTextureCache(cocos2d::CCTextureCache const&);
+	// CCTextureCache();
+	cocos2d::CCTexture2D* addETCImage(char const*);
+	cocos2d::CCTexture2D* addImage(char const*, bool);
+	void addImageAsync(char const*, cocos2d::CCObject*, cocos2d::SEL_MenuHandler, int, cocos2d::CCTexture2DPixelFormat);
+	void addImageAsyncCallBack(float);
+	cocos2d::CCTexture2D* addPVRImage(char const*);
+	cocos2d::CCTexture2D* addUIImage(cocos2d::CCImage*, char const*);
+	char const* description();
+	void dumpCachedTextureInfo();
+	void prepareAsyncLoading();
+	bool reloadTexture(char const*);
+	void removeAllTextures();
+	void removeTexture(cocos2d::CCTexture2D*);
+	void removeTextureForKey(char const*);
+	void removeUnusedTextures();
+	cocos2d::CCDictionary* snapshotTextures();
+	cocos2d::CCTexture2D* textureForKey(char const*);
+}
+
+[[link(win, android)]]
+class cocos2d::extension::CCHttpRequest {
+	void setUrl(char const*);
+}
