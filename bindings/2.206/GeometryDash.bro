@@ -10970,6 +10970,22 @@ class MultilineBitmapFont : cocos2d::CCSprite {
 	gd::string readColorInfo(gd::string) = win 0x6B2E0;
 	gd::string stringWithMaxWidth(gd::string, float, float) = win 0x6BC40;
 	virtual void setOpacity(unsigned char) = win 0x6b260, m1 0x3f73b4;
+	
+	PAD = android32 0x4B0, win 0x4B0;
+	cocos2d::CCArray* m_tagsArray;
+	cocos2d::CCArray* m_lettersArray;
+}
+
+[[link(android)]]
+class CCFontSprite : cocos2d::CCSprite {
+	PAD = win 0x8, android32 0x8, android64 0x4;
+	bool m_isInstant;
+	float m_instantValue;
+	float m_delayTime;
+	float m_shakeVal2;
+	float m_shakeVal1;
+    PAD = win 0x4, android32 0x8, android64 0x8;
+    int m_thisTagNumber;
 }
 
 [[link(android)]]
@@ -15817,6 +15833,15 @@ class TextStyleSection : cocos2d::CCObject {
 	TodoReturn createInstantSection(int, int, float);
 	TodoReturn createShakeSection(int, int, int, int);
 	bool init(int, int, TextStyleType);
+	
+	int m_type;
+	int m_start;
+	int m_end;
+	cocos2d::ccColor3B m_col;
+	float m_instantNum;
+	float m_delayTime;
+	int m_shakeNum1;
+	int m_shakeNum2;
 }
 
 [[link(android)]]
