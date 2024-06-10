@@ -6034,7 +6034,7 @@ class GJAccountManager : cocos2d::CCNode {
 	void getAccountBackupURL();
 	void getAccountSyncURL();
 	cocos2d::CCObject* getDLObject(char const*);
-	gd::string getShaPassword(gd::string) = win 0x1F4FF0;
+	static gd::string getShaPassword(gd::string) = win 0x1F4FF0;
 	void handleIt(bool, gd::string, gd::string, GJHttpType);
 	void handleItDelayed(bool, gd::string, gd::string, GJHttpType);
 	void handleItND(cocos2d::CCNode*, void*);
