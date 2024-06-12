@@ -4,7 +4,7 @@
 
 namespace { namespace format_strings {
     // requires: base_classes, class_name
-    char const* binding_include = R"GEN(#include "binding/{file_name}"
+    char const* binding_include = R"GEN(#include "{base_directory}/{file_name}"
 )GEN";
 
     char const* class_includes = R"GEN(#pragma once
@@ -74,6 +74,8 @@ public:
 
 inline std::string nameForPlatform(Platform platform) {
     switch (platform) {
+        case Platform::MacArm: return "MacOS (ARM)";
+        case Platform::MacIntel: return "MacOS (Intel)";
         case Platform::Mac: return "MacOS";
         case Platform::Windows: return "Windows";
         case Platform::iOS: return "iOS";
@@ -88,7 +90,7 @@ template <class T>
 std::string generateAddressDocs(T const& f, PlatformNumber pn) {
     std::string ret;
 
-    for (auto platform : {Platform::Mac, Platform::Windows, Platform::iOS, Platform::Android}) {
+    for (auto platform : {Platform::MacArm, Platform::MacIntel, Platform::Windows, Platform::iOS, Platform::Android}) {
         auto status = codegen::getStatusWithPlatform(platform, f);
 
         if (status == BindStatus::NeedsBinding) {
@@ -102,7 +104,11 @@ std::string generateAddressDocs(T const& f, PlatformNumber pn) {
                 nameForPlatform(platform)
             );
         }
-        
+        else if (status == BindStatus::Inlined) {
+            ret += fmt::format("     * @note[short] {}: Out of line\n", 
+                nameForPlatform(platform)
+            );
+        }
     }
 
     return ret;
@@ -119,14 +125,20 @@ std::string generateDocs(std::string const& docs) {
     return ret;
 }
 
-std::string generateBindingHeader(Root const& root, ghc::filesystem::path const& singleFolder) {
+std::string generateBindingHeader(Root const& root, ghc::filesystem::path const& singleFolder, std::unordered_set<std::string>* generatedFiles) {
     std::string output;
+    std::string base_directory = singleFolder.filename().string();
 
     {
         std::string filename = "Standalones.hpp";
-        output += fmt::format(format_strings::binding_include, 
+        output += fmt::format(format_strings::binding_include,
+            fmt::arg("base_directory", base_directory),
             fmt::arg("file_name", filename)
         );
+
+        if (generatedFiles != nullptr) {
+            generatedFiles->insert(filename);
+        }
 
         std::string single_output;
         single_output += format_strings::class_includes;
@@ -157,20 +169,30 @@ std::string generateBindingHeader(Root const& root, ghc::filesystem::path const&
         writeFile(singleFolder / filename, single_output);
     }
 
-   	for (auto& cls : root.classes) {
+        for (auto& cls : root.classes) {
         if (is_cocos_class(cls.name))
             continue;
 
         std::string filename = (codegen::getUnqualifiedClassName(cls.name) + ".hpp");
-        output += fmt::format(format_strings::binding_include, 
+        output += fmt::format(format_strings::binding_include,
+            fmt::arg("base_directory", base_directory),
             fmt::arg("file_name", filename)
         );
+
+        if (generatedFiles != nullptr) {
+            generatedFiles->insert(filename);
+        }
 
         std::string single_output;
         if (cls.name != "GDString") {
             single_output += format_strings::class_includes;
         } else {
             single_output += format_strings::class_no_includes;
+        }
+
+        // Hack: Include fmod.hpp if potentially needed.
+        if (can_find(cls.name, "FMOD")) {
+            single_output += "#include <fmod.hpp>\n";
         }
 
         for (auto dep : cls.attributes.depends) {
@@ -236,10 +258,6 @@ std::string generateBindingHeader(Root const& root, ghc::filesystem::path const&
                     unimplementedField = true;
 
                 continue;
-            } else if (auto fn = field.get_as<OutOfLineField>()) {
-                fb = &fn->prototype;
-                addressDocs = "     * @note[short] Out of line\n";
-
             } else if (auto fn = field.get_as<FunctionBindField>()) {
                 if (codegen::getStatus(*fn) == BindStatus::Missing)
                     continue;

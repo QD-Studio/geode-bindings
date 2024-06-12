@@ -1,6 +1,7 @@
 #pragma once
 
 #include <array>
+#include <unordered_set>
 #include <broma.hpp>
 #include <fmt/format.h>
 #include <fmt/ranges.h>
@@ -20,13 +21,14 @@ using namespace broma;
 #include "WindowsSymbol.hpp"
 
 std::string generateAddressHeader(Root const& root);
-std::string generateModifyHeader(Root const& root, ghc::filesystem::path const& singleFolder);
-std::string generateBindingHeader(Root const& root, ghc::filesystem::path const& singleFolder);
+std::string generateModifyHeader(Root const& root, ghc::filesystem::path const& singleFolder, std::unordered_set<std::string>* generatedFiles = nullptr);
+std::string generateBindingHeader(Root const& root, ghc::filesystem::path const& singleFolder, std::unordered_set<std::string>* generatedFiles = nullptr);
 std::string generatePredeclareHeader(Root const& root);
 std::string generateBindingSource(Root const& root);
 std::string generateJsonInterface(Root const& root);
 
-inline void writeFile(ghc::filesystem::path const& writePath, std::string const& output) {
+// returns true if the file contents were different (overwritten), false otherwise
+inline bool writeFile(ghc::filesystem::path const& writePath, std::string const& output) {
     std::ifstream readfile;
     readfile >> std::noskipws;
     readfile.open(writePath);
@@ -38,7 +40,11 @@ inline void writeFile(ghc::filesystem::path const& writePath, std::string const&
         writefile.open(writePath);
         writefile << output;
         writefile.close();
+
+        return true;
     }
+
+    return false;
 }
 
 inline std::string str_if(std::string&& str, bool cond) {
@@ -55,6 +61,7 @@ inline bool is_cocos_class(std::string const& str) {
 
 enum class BindStatus {
     Binded,
+    Inlined,
     NeedsBinding,
     Unbindable,
     Missing,
@@ -99,7 +106,9 @@ namespace codegen {
 
     inline ptrdiff_t platformNumberWithPlatform(Platform p, PlatformNumber const& pn) {
         switch (p) {
-            case Platform::Mac: return pn.mac;
+            case Platform::Mac: return pn.imac;
+            case Platform::MacIntel: return pn.imac;
+            case Platform::MacArm: return pn.m1;
             case Platform::Windows: return pn.win;
             case Platform::iOS: return pn.ios;
             case Platform::Android: return pn.android32;
@@ -122,6 +131,8 @@ namespace codegen {
     }
 
     inline BindStatus getStatusWithPlatform(Platform p, FunctionBindField const& fn) {
+        if (platformNumberWithPlatform(p, fn.binds) == -2) return BindStatus::Inlined;
+
         if ((fn.prototype.attributes.missing & p) != Platform::None) return BindStatus::Missing;
         if ((fn.prototype.attributes.links & p) != Platform::None) return BindStatus::Binded;
 
@@ -131,9 +142,11 @@ namespace codegen {
     }
 
     inline BindStatus getStatusWithPlatform(Platform p, Function const& f) {
-        if ((f.prototype.attributes.missing & p) != Platform::None) return BindStatus::Missing;
+        if (platformNumberWithPlatform(p, f.binds) == -2) return BindStatus::Inlined;
 
+        if ((f.prototype.attributes.missing & p) != Platform::None) return BindStatus::Missing;
         if ((f.prototype.attributes.links & p) != Platform::None) return BindStatus::Binded;
+
         if (platformNumberWithPlatform(p, f.binds) != -1) return BindStatus::NeedsBinding;
 
         return BindStatus::Unbindable;
@@ -192,18 +205,23 @@ namespace codegen {
 
         if (auto fn = f.get_as<FunctionBindField>()) {
             auto status = getStatus(*fn);
+            // TODO: have windows32 and windows64 separate?
 
             if (fn->prototype.is_static) {
-                if (status == BindStatus::Binded) return "Cdecl";
-                else return "Optcall";
-            }
-            else if (fn->prototype.is_virtual || fn->prototype.is_callback) {
-                return "Thiscall";
+                return "Default";
+                // if (status == BindStatus::Binded) return "Cdecl";
+                // else return "Optcall";
             }
             else {
-                if (status == BindStatus::Binded) return "Thiscall";
-                else return "Membercall";
+                return "Thiscall";
             }
+            // else if (fn->prototype.is_virtual || fn->prototype.is_callback) {
+            //     return "Thiscall";
+            // }
+            // else {
+            //     if (status == BindStatus::Binded) return "Thiscall";
+            //     else return "Membercall";
+            // }
         }
         else throw codegen::error("Tried to get convention of non-function");
     }

@@ -148,12 +148,19 @@ if (GEODE_IS_MEMBER_TEST)
 endif()
 
 add_library(${PROJECT_NAME} ${GEODE_CODEGEN_PATH}/Geode/GeneratedSource.cpp)
-target_include_directories(${PROJECT_NAME} PUBLIC ${GEODE_CODEGEN_PATH})
+target_include_directories(${PROJECT_NAME} PUBLIC
+	${GEODE_CODEGEN_PATH}
+	${CMAKE_CURRENT_SOURCE_DIR}/bindings/include
+)
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden)
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
 
-if (APPLE)
+if (WIN32)
+	if (MSVC)
+		target_compile_options(${PROJECT_NAME} PUBLIC /bigobj)
+	endif()
+elseif (APPLE)
 	target_compile_options(${PROJECT_NAME} PUBLIC -ffunction-sections -fdata-sections)
 	target_link_options(${PROJECT_NAME} PUBLIC -dead_strip)
 elseif (ANDROID)

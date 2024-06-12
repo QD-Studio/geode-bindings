@@ -12,7 +12,7 @@ add_compile_definitions(GEODE_IS_MEMBER_TEST)
 if (WIN32)
 	target_sources(${PROJECT_NAME} PRIVATE Windows.cpp)
 else()
-	target_sources(${PROJECT_NAME} PRIVATE MacOS.cpp Android32.cpp Android64.cpp)
+	target_sources(${PROJECT_NAME} PRIVATE MacOSArm.cpp MacOSIntel.cpp Android32.cpp Android64.cpp)
 endif()
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_20)
@@ -22,16 +22,8 @@ cmake_path(SET GEODE_LOADER_PATH $ENV{GEODE_SDK}/loader)
 include($ENV{GEODE_SDK}/cmake/PlatformDetect.cmake)
 
 if (NOT DEFINED GEODE_GD_VERSION)
-	if (${GEODE_TARGET_PLATFORM} STREQUAL "Win32")
-		set(GEODE_GD_VERSION 2.204)
-		set(GEODE_COMP_GD_VERSION 22040)
-	elseif (${GEODE_TARGET_PLATFORM} STREQUAL "Android32" OR ${GEODE_TARGET_PLATFORM} STREQUAL "Android64")
-		set(GEODE_GD_VERSION 2.205)
-		set(GEODE_COMP_GD_VERSION 22050)
-	else()
-		set(GEODE_GD_VERSION 2.200)
-		set(GEODE_COMP_GD_VERSION 22000)
-	endif()
+	set(GEODE_GD_VERSION 2.206)
+	set(GEODE_COMP_GD_VERSION 22060)
 endif()
 
 if (WIN32)
@@ -57,5 +49,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 	${GEODE_LOADER_PATH}/include/Geode/cocos/include
 	${GEODE_LOADER_PATH}/include/Geode/cocos/extensions
 	${GEODE_LOADER_PATH}/include/Geode/fmod
+	${GeodeBindings_SOURCE_DIR}/bindings/include
 )
 target_link_directories(${PROJECT_NAME} PRIVATE ${GEODE_LOADER_PATH}/include/link)

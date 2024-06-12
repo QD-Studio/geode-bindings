@@ -719,7 +719,22 @@ class cocos2d::CCEGLView {
 	// CCEGLView(cocos2d::CCEGLView const&);
 	virtual void swapBuffers();
 	void toggleFullScreen(bool, bool);
-	// rest are in extras
+	void pollEvents();
+	void setupWindow(cocos2d::CCRect);
+	void end();
+	// rest are in extras (lie)
+	void onGLFWCharCallback(GLFWwindow* window, unsigned int entered);
+	void onGLFWCursorEnterFunCallback(GLFWwindow* window, int entered);
+	void onGLFWDeviceChangeFunCallback(GLFWwindow* window);
+	void onGLFWError(int code, char const* description);
+	void onGLFWKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	void onGLFWMouseCallBack(GLFWwindow* window, int button, int action, int mods);
+	void onGLFWMouseMoveCallBack(GLFWwindow* window, double x, double y);
+	void onGLFWMouseScrollCallback(GLFWwindow* window, double xOffset, double yOffset);
+	void onGLFWWindowIconifyFunCallback(GLFWwindow* window, int iconified);
+	void onGLFWWindowPosCallback(GLFWwindow* window, int x, int y);
+	void onGLFWWindowSizeFunCallback(GLFWwindow* window, int width, int height);
+	void onGLFWframebuffersize(GLFWwindow* window, int width, int height);
 }
 
 [[link(win, android)]]
@@ -1078,6 +1093,7 @@ class cocos2d::CCLabelBMFont {
 
 [[link(win, android)]]
 class cocos2d::CCApplication {
+	virtual int run();
 	virtual void gameDidSave();
 	virtual void openURL(char const*);
 }
@@ -1297,32 +1313,90 @@ class cocos2d::CCDelayTime {
 }
 
 [[link(win, android)]]
-class cocos2d::CCTextureCache {
-	static void purgeSharedTextureCache();
-	static void reloadAllTextures();
-	static cocos2d::CCTextureCache* sharedTextureCache();
+class cocos2d::CCTextFieldTTF {
+	// CCTextFieldTTF();
+	// virtual ~CCTextFieldTTF();
 
-	// CCTextureCache(cocos2d::CCTextureCache const&);
-	// CCTextureCache();
-	cocos2d::CCTexture2D* addETCImage(char const*);
-	cocos2d::CCTexture2D* addImage(char const*, bool);
-	void addImageAsync(char const*, cocos2d::CCObject*, cocos2d::SEL_MenuHandler, int, cocos2d::CCTexture2DPixelFormat);
-	void addImageAsyncCallBack(float);
-	cocos2d::CCTexture2D* addPVRImage(char const*);
-	cocos2d::CCTexture2D* addUIImage(cocos2d::CCImage*, char const*);
-	char const* description();
-	void dumpCachedTextureInfo();
-	void prepareAsyncLoading();
-	bool reloadTexture(char const*);
-	void removeAllTextures();
-	void removeTexture(cocos2d::CCTexture2D*);
-	void removeTextureForKey(char const*);
-	void removeUnusedTextures();
-	cocos2d::CCDictionary* snapshotTextures();
-	cocos2d::CCTexture2D* textureForKey(char const*);
+	static CCTextFieldTTF* textFieldWithPlaceHolder(const char* placeholder, const cocos2d::CCSize& dimensions, cocos2d::CCTextAlignment alignment, const char* fontName, float fontSize);
+	static CCTextFieldTTF* textFieldWithPlaceHolder(const char* placeholder, const char* fontName, float fontSize);
+
+	bool initWithPlaceHolder(const char* placeholder, const cocos2d::CCSize& dimensions, cocos2d::CCTextAlignment alignment, const char* fontName, float fontSize);
+	bool initWithPlaceHolder(const char* placeholder, const char* fontName, float fontSize);
+
+	void setDelegate(cocos2d::CCTextFieldDelegate* var);
+
+	virtual void draw();
+	virtual const cocos2d::ccColor3B& getColorSpaceHolder();
+	virtual void setColorSpaceHolder(const cocos2d::ccColor3B& color);
+	virtual const char* getPlaceHolder();
+	virtual void setPlaceHolder(const char* text);
+	virtual void setSecureTextEntry(bool value);
+	virtual bool isSecureTextEntry();
+
+	virtual void setString(const char* text);
+	virtual const char* getString();
+
+	virtual bool attachWithIME();
+	virtual bool detachWithIME();
+	virtual bool canAttachWithIME();
+	virtual bool canDetachWithIME();
+	virtual void insertText(const char* text, int len, cocos2d::enumKeyCodes keyCode);
+	virtual void deleteBackward();
+	virtual void deleteForward();
+	virtual const char* getContentText();
 }
 
 [[link(win, android)]]
-class cocos2d::extension::CCHttpRequest {
-	void setUrl(char const*);
+class cocos2d::extension::CCScale9Sprite {
+	static cocos2d::extension::CCScale9Sprite* create();
+	static cocos2d::extension::CCScale9Sprite* createWithSpriteFrameName(char const*);
+	static cocos2d::extension::CCScale9Sprite* createWithSpriteFrameName(char const*, cocos2d::CCRect);
+	static cocos2d::extension::CCScale9Sprite* create(char const*);
+	static cocos2d::extension::CCScale9Sprite* create(char const*, cocos2d::CCRect);
+
+	CCScale9Sprite();
+	~CCScale9Sprite();
+
+	virtual bool init();
+	virtual void setContentSize(const cocos2d::CCSize& size);
+	virtual void visit();
+	virtual GLubyte getOpacity();
+	virtual void setOpacity(GLubyte opacity);
+	virtual void updateDisplayedOpacity(GLubyte parentOpacity);
+	virtual const cocos2d::ccColor3B& getColor();
+	virtual void setColor(const cocos2d::ccColor3B& color);
+	virtual void updateDisplayedColor(const cocos2d::ccColor3B& parentColor);
+	virtual void setOpacityModifyRGB(bool bValue);
+	virtual bool isOpacityModifyRGB();
+	virtual cocos2d::CCSize getPreferredSize();
+	virtual void setPreferredSize(cocos2d::CCSize);
+	virtual cocos2d::CCRect getCapInsets();
+	virtual void setCapInsets(cocos2d::CCRect);
+	virtual float getInsetLeft();
+	virtual void setInsetLeft(float);
+	virtual float getInsetTop();
+	virtual void setInsetTop(float);
+	virtual float getInsetRight();
+	virtual void setInsetRight(float);
+	virtual float getInsetBottom();
+	virtual void setInsetBottom(float);
+	virtual bool initWithBatchNode(cocos2d::CCSpriteBatchNode*, cocos2d::CCRect, bool, cocos2d::CCRect);
+	virtual bool initWithBatchNode(cocos2d::CCSpriteBatchNode*, cocos2d::CCRect, cocos2d::CCRect);
+	virtual bool initWithFile(const char*, cocos2d::CCRect, cocos2d::CCRect);
+	virtual bool initWithFile(const char*, cocos2d::CCRect);
+	virtual bool initWithFile(cocos2d::CCRect, const char*);
+	virtual bool initWithFile(const char*);
+	virtual bool initWithSpriteFrame(cocos2d::CCSpriteFrame*, cocos2d::CCRect);
+	virtual bool initWithSpriteFrame(cocos2d::CCSpriteFrame*);
+	virtual bool initWithSpriteFrameName(const char*, cocos2d::CCRect);
+	virtual bool initWithSpriteFrameName(const char*);
+	virtual bool updateWithBatchNode(cocos2d::CCSpriteBatchNode*, cocos2d::CCRect, bool, cocos2d::CCRect);
+	virtual void setSpriteFrame(cocos2d::CCSpriteFrame*);
+}
+
+[[link(win, android)]]
+class cocos2d::extension::CCHttpClient : cocos2d::CCObject {
+	static cocos2d::extension::CCHttpClient* getInstance();
+	static void destroyInstance();
+	void send(cocos2d::extension::CCHttpRequest* request);
 }
