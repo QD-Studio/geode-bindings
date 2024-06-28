@@ -10971,7 +10971,7 @@ class MultilineBitmapFont : cocos2d::CCSprite {
 	gd::string stringWithMaxWidth(gd::string, float, float) = win 0x6BC40;
 	virtual void setOpacity(unsigned char) = win 0x6b260, m1 0x3f73b4;
 	
-	PAD = android32 0x4B0, win 0x4B0;
+	PAD = android32 0x4B0, win 0x4B0, android64 0x4B0;
 	cocos2d::CCArray* m_tagsArray;
 	cocos2d::CCArray* m_lettersArray;
 }
