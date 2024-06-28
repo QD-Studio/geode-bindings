@@ -10621,15 +10621,19 @@ class MPLobbyLayer : cocos2d::CCLayer, GJMPDelegate, UploadPopupDelegate, Upload
 
 [[link(android)]]
 class MultilineBitmapFont : cocos2d::CCSprite {
-	// virtual ~MultilineBitmapFont();
+	// virtual ~MultilineBitmapFont() = win 0x48930;
 
-	TodoReturn createWithFont(char const*, gd::string, float, float, cocos2d::CCPoint, int, bool);
-	TodoReturn initWithFont(char const*, gd::string, float, float, cocos2d::CCPoint, int, bool);
-	TodoReturn moveSpecialDescriptors(int, int);
-	TodoReturn readColorInfo(gd::string);
-	TodoReturn stringWithMaxWidth(gd::string, float, float);
+	MultilineBitmapFont* createWithFont(char const*, gd::string, float, float, cocos2d::CCPoint, int, bool) = win 0x48981;
+	bool initWithFont(char const*, gd::string, float, float, cocos2d::CCPoint, int, bool) = win 0x48A70;
+	unsigned int moveSpecialDescriptors(int, int) = win 0x49900;
+	gd::string readColorInfo(gd::string) = win 0x49300;
+	gd::string stringWithMaxWidth(gd::string, float, float) = win 0x49980;
 
 	virtual void setOpacity(unsigned char) = win 0x492a0;
+
+	PAD = win 0x4B0, android32 0x4B0;
+	cocos2d::CCArray* m_tagsArray;
+	cocos2d::CCArray* m_lettersArray;
 }
 
 [[link(android)]]
@@ -15405,13 +15409,22 @@ class TextInputDelegate {
 class TextStyleSection : cocos2d::CCObject {
 	// virtual ~TextStyleSection();
 
-	static TextStyleSection* create(int, int, TextStyleType);
+	static TextStyleSection* create(int, int, TextStyleType) = win 0x49F10;
 
 	TodoReturn createColoredSection(cocos2d::ccColor3B, int, int);
 	TodoReturn createDelaySection(int, float);
 	TodoReturn createInstantSection(int, int, float);
 	TodoReturn createShakeSection(int, int, int, int);
 	bool init(int, int, TextStyleType);
+
+	int m_type; // TextStyleType
+	int m_start;
+	int m_end;
+	cocos2d::ccColor3B m_col;
+	float m_instantNum;
+	float m_delayTime;
+	int m_shakeNum1;
+	int m_shakeNum2;
 }
 
 [[link(android)]]
