@@ -6027,12 +6027,12 @@ class GJAccountManager : cocos2d::CCNode {
 
 	void addDLToActive(char const* tag, cocos2d::CCObject*);
 	void addDLToActive(char const* tag);
-	bool backupAccount(gd::string);
+	bool backupAccount(gd::string) = win 0x1f2bc0;
 	void dataLoaded(DS_Dictionary*);
 	void encodeDataTo(DS_Dictionary*);
 	void firstSetup();
-	void getAccountBackupURL();
-	void getAccountSyncURL();
+	bool getAccountBackupURL() = win 0x1F25A0;
+	bool getAccountSyncURL() = win 0x1F3500;
 	cocos2d::CCObject* getDLObject(char const*);
 	static gd::string getShaPassword(gd::string) = win 0x1F4FF0;
 	void handleIt(bool, gd::string, gd::string, GJHttpType);
@@ -6045,14 +6045,14 @@ class GJAccountManager : cocos2d::CCNode {
 	void onGetAccountBackupURLCompleted(gd::string, gd::string);
 	void onGetAccountSyncURLCompleted(gd::string, gd::string);
 	void onLoginAccountCompleted(gd::string, gd::string);
-	void onProcessHttpRequestCompleted(cocos2d::extension::CCHttpClient*, cocos2d::extension::CCHttpResponse*);
+	void onProcessHttpRequestCompleted(cocos2d::extension::CCHttpClient*, cocos2d::extension::CCHttpResponse*) = win 0x1F1490;
 	void onRegisterAccountCompleted(gd::string, gd::string);
 	void onSyncAccountCompleted(gd::string, gd::string);
 	void onUpdateAccountSettingsCompleted(gd::string, gd::string);
 	void ProcessHttpRequest(gd::string, gd::string, gd::string, GJHttpType);
 	void registerAccount(gd::string, gd::string, gd::string);
 	void removeDLFromActive(char const*);
-	bool syncAccount(gd::string);
+	bool syncAccount(gd::string) = win 0x1f3b10;
 	void unlinkFromAccount();
 	void updateAccountSettings(int, int, int, gd::string, gd::string, gd::string);
 
@@ -10720,7 +10720,7 @@ class MenuLayer : cocos2d::CCLayer, FLAlertLayerProtocol, GooglePlayDelegate {
 
 	static cocos2d::CCScene* scene(bool) = win 0x312f60, imac 0x392b80, m1 0x31ad64;
 
-	TodoReturn endGame();
+	void endGame() = win 0x315a30, imac 0x394f60, m1 0x31d060, ios 0x277ddc;
 	TodoReturn firstNetworkTest() = win 0x314950;
 	void onAchievements(cocos2d::CCObject* sender) = win 0x314e80;
 	void onCreator(cocos2d::CCObject* sender) = win 0x315390;
