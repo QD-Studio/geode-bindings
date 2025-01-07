@@ -21094,3 +21094,14 @@ class WorldSelectLayer : cocos2d::CCLayer, BoomScrollLayerDelegate {
     bool m_unkBool2;
 }
 
+[[link(android)]]
+class CCFontSprite : cocos2d::CCSprite {
+    PAD = win 0x8, android32 0x8, android64 0x4;
+    bool m_isInstant;
+    float m_instantValue;
+    float m_delayTime;
+    float m_shakeVal2;
+    float m_shakeVal1;
+    PAD = win 0x4, android32 0x8, android64 0x8;
+    int m_thisTagNumber;
+}
